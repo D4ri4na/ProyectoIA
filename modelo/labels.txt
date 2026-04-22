@@ -1,0 +1,5 @@
+0 Sana
+1 Virus_del_mosaico
+2 Muermo_rojo
+3 Roya
+4 Sindrome_de_la_hoja_amarilla
