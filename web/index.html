@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Caña Saludable · Detector de Enfermedades</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+<div class="grain"></div>
+
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-icon">🌿</span>
+      <div>
+        <p class="brand-name">Caña Saludable</p>
+        <p class="brand-sub">Detector de Enfermedades</p>
+      </div>
+    </div>
+
+    <div class="status-card" id="statusCard">
+      <div class="status-dot" id="statusDot"></div>
+      <p class="status-text" id="statusText">Conectando…</p>
+    </div>
+
+    <div class="legend">
+      <p class="legend-title">Clases detectables</p>
+      <ul class="legend-list">
+        <li><span class="tag healthy">Sana</span></li>
+        <li><span class="tag">Virus del Mosaico</span></li>
+        <li><span class="tag">Muermo Rojo</span></li>
+        <li><span class="tag">Roya</span></li>
+        <li><span class="tag">Sínd. Hoja Amarilla</span></li>
+      </ul>
+    </div>
+
+    <p class="sidebar-note">Modelo Teachable Machine · TF/Keras</p>
+  </aside>
+
+  <main class="main">
+
+    <header class="top-header">
+      <h1 class="page-title">Análisis Fitosanitario</h1>
+      <p class="page-sub">Carga una imagen o usa tu cámara para identificar enfermedades en hojas de caña de azúcar.</p>
+    </header>
+
+    <div class="input-row">
+
+      <section class="card upload-card" id="uploadZone">
+        <div class="upload-inner" id="uploadInner">
+          <div class="upload-icon">📷</div>
+          <p class="upload-title">Arrastra tu imagen aquí</p>
+          <p class="upload-hint">JPG, PNG, BMP — o haz clic para explorar</p>
+          <button class="btn btn-outline" id="browseBtn">Seleccionar archivo</button>
+          <input type="file" id="fileInput" accept="image/*" hidden />
+        </div>
+        <div class="preview-wrapper hidden" id="previewWrapper">
+          <img id="previewImg" src="" alt="Vista previa" />
+          <button class="btn-icon remove-btn" id="removeBtn" title="Quitar imagen">✕</button>
+        </div>
+      </section>
+
+      <section class="card camera-card">
+        <p class="card-label">Cámara en vivo</p>
+        <div class="camera-viewport" id="cameraViewport">
+          <video id="videoEl" autoplay playsinline></video>
+          <div class="camera-overlay" id="cameraOverlay">
+            <span class="camera-icon">📹</span>
+            <p>Cámara desactivada</p>
+          </div>
+          <canvas id="snapCanvas" hidden></canvas>
+        </div>
+        <div class="camera-controls">
+          <button class="btn btn-outline" id="cameraToggleBtn">Activar cámara</button>
+          <button class="btn btn-primary" id="snapBtn" disabled>Capturar</button>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="analyze-row">
+      <button class="btn btn-analyze" id="analyzeBtn" disabled>
+        <span class="btn-icon-left">🔬</span> Analizar imagen
+      </button>
+    </div>
+
+    <section class="results-section hidden" id="resultsSection">
+
+      <div class="results-grid">
+
+        <div class="card result-card diagnosis-card">
+          <p class="card-label">Diagnóstico</p>
+          <p class="diagnosis-name" id="diagnosisName">—</p>
+          <div class="conf-row">
+            <span class="card-label">Confianza</span>
+            <span class="conf-pct" id="confPct">0%</span>
+          </div>
+          <div class="conf-bar-track">
+            <div class="conf-bar-fill" id="confBarFill" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="card result-card breakdown-card">
+          <p class="card-label">Desglose de probabilidades</p>
+          <div class="breakdown-list" id="breakdownList"></div>
+        </div>
+
+      </div>
+
+      <div class="analyzed-thumb-wrap">
+        <p class="card-label">Imagen analizada</p>
+        <img id="analyzedThumb" src="" alt="Analizada" class="analyzed-thumb" />
+      </div>
+
+    </section>
+
+    <div class="loading-overlay hidden" id="loadingOverlay">
+      <div class="spinner"></div>
+      <p>Analizando imagen…</p>
+    </div>
+
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
