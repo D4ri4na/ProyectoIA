@@ -1,69 +1,138 @@
 # 🌾 Sistema Inteligente de Diagnóstico Foliar para Caña de Azúcar
 
-![Estado](https://img.shields.io/badge/Estado-Completado-success)
-![Versión](https://img.shields.io/badge/Versión-1.0.0-blue)
-![Python](https://img.shields.io/badge/Python-3.12-yellow)
-![Framework](https://img.shields.io/badge/Framework-Flask-black)
-
 ## 📌 Descripción del Proyecto
-Este proyecto es una aplicación web impulsada por Inteligencia Artificial diseñada para automatizar la identificación de patologías foliares en cultivos de caña de azúcar (*Saccharum officinarum*). 
 
-Desarrollado como solución tecnológica para la agroindustria del departamento de Santa Cruz, el sistema utiliza un modelo de clasificación automatizada entrenado con un banco híbrido de **2,523 imágenes reales**. El objetivo es proporcionar a los productores una primera línea de defensa tecnológica, mitigando la dependencia de inspecciones manuales y optimizando los tiempos de reacción ante brotes infecciosos.
+Esta plataforma es una solución tecnológica integral diseñada para automatizar y democratizar el diagnóstico fitopatológico en el sector agroindustrial de Santa Cruz, Bolivia. El proyecto utiliza Inteligencia Artificial (Redes Neuronales Convolucionales) entrenada con un banco fotográfico híbrido de **2,521 imágenes reales** del tejido foliar de la caña de azúcar (*Saccharum officinarum*).
 
-## 🎯 Enfermedades Detectables
-El modelo es capaz de clasificar hojas sanas y diagnosticar cuatro de las enfermedades de mayor impacto económico en la región:
+El repositorio documenta la evolución arquitectónica del sistema en dos grandes fases:
+
+1. **Fase 1 (Plataforma Web):** Arquitectura tradicional Cliente-Servidor impulsada por Flask.
+2. **Fase 2 (Aplicación Móvil - *Edge Computing*):** Aplicación nativa autónoma que procesa las imágenes y devuelve diagnósticos matemáticos sin necesidad de conexión a internet, ideal para zonas rurales.
+
+## 🔗 Recursos de la Defensa
+
+* **📄 Documentación del Proyecto:** [https://docs.google.com/document/d/1vAMUaaMsnxUT14SCvp_RCP0-2i-kv4qgUWhQa0mgq-o/edit?tab=t.y3h4t2ri67h8]
+* **📊 Presentación y Diapositivas:** [https://canva.link/fajrxmtpr6tt7wc]
+
+## 🎯 Enfermedades Detectables y Capacidades
+
+El modelo es capaz de clasificar hojas sanas y diagnosticar cuatro de las enfermedades de mayor impacto económico en la región, calculando su distribución de confianza (porcentajes de probabilidad) en milisegundos:
+
 1. **Hoja Sana (Control)**
-2. **Roya** (*Puccinia*)
-3. **Muermo Rojo** (*Colletotrichum*)
-4. **Virus del Mosaico**
-5. **Síndrome de la Hoja Amarilla**
+2. **Roya** (*Puccinia melanocephala*)
+3. **Muermo Rojo** (*Colletotrichum falcatum*)
+4. **Virus del Mosaico** (SCMV)
+5. **Síndrome de la Hoja Amarilla** (SCYLV)
 
-*Precisión predictiva global validada: **94.53%***
+*Precisión predictiva global validada: **>80% con Fine-Tuning y Parada Temprana***
 
-## ⚙️ Arquitectura del Sistema
-El proyecto sigue una arquitectura **Cliente-Servidor** separando la lógica de inferencia de la interfaz de usuario:
+---
 
-* **Backend (Python/Flask):** Orquesta la recepción de datos y la comunicación con el modelo de aprendizaje automático (`keras_model.h5`).
-* **Modelo de IA:** Utiliza TensorFlow/Keras para procesar tensores de imágenes (224x224 px) y calcular las probabilidades de clasificación.
-* **Frontend (HTML5/CSS/JS Vanilla):** Interfaz web minimalista e interactiva que permite a los usuarios cargar imágenes desde sus dispositivos o capturar fotografías en tiempo real mediante la cámara del navegador.
+## 📁 Estructura General del Repositorio
 
-## 📁 Estructura del Repositorio
+El repositorio se divide en tres módulos independientes:
+
 ```text
 /
-├── app.py                # Servidor principal (Flask)
-├── model_logic.py        # Clase que gestiona la carga y predicción de la IA
-├── keras_model.h5        # Pesos y estructura del modelo entrenado
-├── labels.txt            # Etiquetas de clasificación
-├── requirements.txt      # Dependencias del proyecto
-├── style.css             # Estilos de la aplicación web
-├── app.js                # Lógica de cliente (Cámara y envíos asíncronos)
-└── index.html            # Estructura de la interfaz
+├── web/                         # MÓDULO 1: Aplicación Web Original (Flask)
+│   ├── app.py                   # Servidor backend
+│   ├── keras_model.h5           # Modelo IA en formato Keras
+│   ├── index.html / app.js      # Interfaz frontend
+│   └── requirements.txt         
+├── entrenamiento/               # MÓDULO 2: Motor de Inteligencia Artificial
+│   ├── entrenar_modelo.py       # Script de Transfer Learning y Fine-Tuning
+│   └── graficas/                # Resultados de métricas (Accuracy, Loss, Matriz)
+└── cana_saludable/              # MÓDULO 3: Aplicación Móvil (Flutter)
+    ├── assets/                  # Modelo optimizado (modelo_cana_offline.tflite) e identidad visual
+    ├── lib/main.dart            # Interfaz adaptativa, cámara e inferencia tensorial
+    └── pubspec.yaml             # Dependencias del entorno móvil
+
 ```
 
-## 🚀 Guía de Instalación y Uso
+---
 
-### 1. Requisitos Previos
-Asegúrate de tener instalado Python (versión recomendada 3.10+). Es aconsejable utilizar un entorno virtual.
+## 🚀 Guías de Instalación y Ejecución
 
-### 2. Instalación de Dependencias
-Abre tu terminal en la carpeta raíz del proyecto y ejecuta:
+A continuación, se detalla cómo levantar cada uno de los módulos del proyecto:
+
+### ⚙️ Módulo 1: Entrenamiento de la IA (Python)
+
+Este módulo se encarga de procesar las imágenes, aplicar *Transfer Learning* (MobileNetV2) y ejecutar el Ajuste Fino (*Fine-Tuning*).
+
+1. Abre tu terminal en la carpeta `/entrenamiento`.
+2. Crea y activa un entorno virtual:
+```bash
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1   # En Windows PowerShell
+
+```
+
+
+3. Instala las dependencias matemáticas:
+```bash
+pip install tensorflow matplotlib seaborn scikit-learn
+
+```
+
+
+4. Ejecuta el entrenamiento (generará automáticamente el modelo `.tflite` y las gráficas):
+```bash
+python entrenar_modelo.py
+
+```
+
+
+
+### 🌐 Módulo 2: Aplicación Web (Flask)
+
+1. Abre tu terminal en la carpeta `/web` (asegúrate de tener Python 3.10+).
+2. Instala las dependencias del servidor:
 ```bash
 pip install -r requirements.txt
-```
-*(Nota: Las librerías principales incluyen `flask`, `tensorflow`, `tf-keras`, `Pillow` y `numpy`).*
 
-### 3. Ejecución del Servidor
-Para iniciar la aplicación, ejecuta el siguiente comando:
+```
+
+
+3. Levanta el servidor Backend (procesamiento IA):
 ```bash
 python app.py
+
 ```
 
-### 4. Acceso a la Interfaz
-Una vez que la consola indique que el servidor está corriendo (generalmente en el puerto 5000), en otra terminal ejecuta el siguiente comando:
+
+4. En una terminal nueva, levanta el servidor Frontend:
 ```bash
 python -m http.server 8080 
+
 ```
-Y en tu navegador busca http://localhost:8080/ para que te aparezca la interfaz
 
-> **Aviso sobre el uso de la cámara:** Para probar la funcionalidad de captura en tiempo real, debes acceder mediante `localhost`. Si despliegas la aplicación en un servidor en la nube (ej. AWS EC2), requerirás configurar un certificado SSL (HTTPS) para que los navegadores permitan el acceso a la cámara web.
 
+5. Accede desde tu navegador a `http://localhost:8080/`. *(Nota: Para usar la cámara web en producción fuera de localhost, se requiere configurar un certificado SSL/HTTPS).*
+
+### 📱 Módulo 3: Aplicación Móvil Offline (Flutter)
+
+Esta aplicación contiene el modelo comprimido y funciona de manera 100% local.
+
+1. Abre tu terminal en la carpeta `/entrenamiento/cana_saludable/`.
+2. Descarga las dependencias del framework (TensorFlow Lite Flutter, Image Picker):
+```bash
+flutter pub get
+
+```
+
+
+3. (Opcional) Si cambiaste la imagen `logo.png` en los *assets*, regenera los íconos del sistema:
+```bash
+dart run flutter_launcher_icons
+
+```
+
+
+4. Compila el instalador APK de producción:
+```bash
+flutter build apk --release
+
+```
+
+
+*El archivo final se ubicará en `build/app/outputs/flutter-apk/app-release.apk`, listo para ser transferido a cualquier dispositivo Android.*

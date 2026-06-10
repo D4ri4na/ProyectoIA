@@ -56,14 +56,63 @@ x = layers.Dropout(0.2)(x)
 outputs = layers.Dense(len(class_names), activation='softmax')(x)
 model = tf.keras.Model(inputs, outputs)
 
-# 6. Compilar
+# =========================================================================
+# 6. FASE 1: Entrenamiento Inicial (El Médico General)
+# =========================================================================
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
               loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
 
-# 7. Entrenar
-print("\nIniciando el entrenamiento...")
-history = model.fit(train_dataset, validation_data=val_dataset, epochs=15)
+print("\n--- Iniciando Fase 1: Entrenamiento de la capa superior ---")
+# Entrenamos por unas 10 épocas para que la base se estabilice
+history_fase1 = model.fit(train_dataset, validation_data=val_dataset, epochs=10)
+
+# =========================================================================
+# 7. FASE 2: Ajuste Fino / Fine-Tuning (La Especialización)
+# =========================================================================
+print("\n--- Iniciando Fase 2: Ajuste Fino (Fine-Tuning) ---")
+
+# 1. Descongelamos el cerebro del modelo base
+base_model.trainable = True
+
+# 2. Congelamos las primeras 100 capas (para mantener lo básico como bordes y colores)
+# y dejamos que solo las capas más profundas se especialicen en las hojas.
+fine_tune_at = 100
+for layer in base_model.layers[:fine_tune_at]:
+    layer.trainable = False
+
+# 3. Re-compilamos con una tasa de aprendizaje (Learning Rate) EXTREMADAMENTE baja.
+# Esto es vital para "ajustar" el conocimiento sin destruir lo que aprendió en la Fase 1.
+model.compile(loss='sparse_categorical_crossentropy',
+              optimizer=tf.keras.optimizers.RMSprop(learning_rate=0.00001), 
+              metrics=['accuracy'])
+
+# 4. Creamos el "Paracaídas" (Early Stopping)
+# La IA intentará entrenar 20 épocas más, pero si pasa 4 épocas sin mejorar, 
+# se detendrá automáticamente y recuperará los pesos de su mejor momento.
+paracaidas = tf.keras.callbacks.EarlyStopping(
+    monitor='val_accuracy',
+    patience=4,               
+    restore_best_weights=True 
+)
+
+# 5. Entrenamos la Fase 2
+total_epochs = 10 + 20 
+history_fase2 = model.fit(train_dataset,
+                          validation_data=val_dataset,
+                          epochs=total_epochs,
+                          initial_epoch=history_fase1.epoch[-1],
+                          callbacks=[paracaidas])
+
+# Igualamos la variable para que el código de tus gráficas funcione intacto
+history = history_fase1
+
+history.history['accuracy'] += history_fase2.history['accuracy']
+history.history['val_accuracy'] += history_fase2.history['val_accuracy']
+history.history['loss'] += history_fase2.history['loss']
+history.history['val_loss'] += history_fase2.history['val_loss']
+
+# (Asegúrate de que el resto del código que exporta el modelo y hace las gráficas siga debajo de esto)
 
 # =========================================================================
 # 8. GENERACIÓN DE GRÁFICAS PARA LA DOCUMENTACIÓN
